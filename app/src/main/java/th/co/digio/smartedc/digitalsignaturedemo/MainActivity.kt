@@ -5,10 +5,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.ToastUtils
-import java.security.KeyStore
-import java.security.PrivateKey
-import java.security.PublicKey
-import java.security.Signature
+import com.itextpdf.kernel.pdf.PdfReader
+import com.itextpdf.kernel.pdf.StampingProperties
+import com.itextpdf.signatures.*
+import com.itextpdf.signatures.PdfSigner.CryptoStandard
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.io.FileOutputStream
+import java.io.IOException
+import java.security.*
+import java.security.cert.Certificate
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +29,15 @@ class MainActivity : AppCompatActivity() {
         textView = findViewById(R.id.tv)
         textView.text = hex
         ToastUtils.showShort(verify(getPublicKey(loadKeyStore()), digitalSignature, pdf).toString())
+
+        val provider = BouncyCastleProvider()
+        Security.addProvider(provider)
+        val ks = loadKeyStore()
+        val alias = ks.aliases().nextElement()
+        val pk = getPrivateKey(ks)
+        val chain = ks.getCertificateChain(alias)
+
+        sign("", "", chain, pk, DigestAlgorithms.SHA256, provider.name, CryptoStandard.CADES)
     }
 
     private fun loadKeyStore(): KeyStore {
@@ -56,6 +70,26 @@ class MainActivity : AppCompatActivity() {
         signature.initVerify(publicKey)
         signature.update(messageByteArray)
         return signature.verify(signatureByteArray)
+    }
+
+    @Throws(GeneralSecurityException::class, IOException::class)
+    fun sign(
+        src: String?,
+        dest: String?,
+        chain: Array<Certificate?>?,
+        pk: PrivateKey?,
+        digestAlgorithm: String?,
+        provider: String?,
+        signatureType: CryptoStandard?
+    ) {
+        val reader = PdfReader(src)
+        val signer = PdfSigner(reader, FileOutputStream(dest), StampingProperties())
+        signer.fieldName = "sig"
+        val pks: IExternalSignature = PrivateKeySignature(pk, digestAlgorithm, provider)
+        val digest: IExternalDigest = BouncyCastleDigest()
+
+        // Sign the document using the detached mode, CMS or CAdES equivalent.
+        signer.signDetached(digest, pks, chain, null, null, null, 0, signatureType)
     }
 
 }
