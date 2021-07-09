@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadKeyStore(): KeyStore {
         val keyStore = KeyStore.getInstance("PKCS12")
-        val keyPair = KeyPairGenerator.getInstance("PKCS12").genKeyPair()
         keyStore.load(resources.openRawResource(R.raw.sender_keystore), "changeit".toCharArray())
         return keyStore
     }
