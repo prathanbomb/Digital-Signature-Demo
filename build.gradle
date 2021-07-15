@@ -1,13 +1,19 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.kotlin_version = "1.5.20"
+    ext.kotlin_version = "1.5.21"
+    ext.artifactregistry_pluging_version = "2.1.1"
+
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "gradle.plugin.com.google.cloud.artifactregistry:artifactregistry-gradle-plugin:$artifactregistry_pluging_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -15,9 +21,52 @@ buildscript {
 }
 
 allprojects {
+    apply plugin: "com.google.cloud.artifactregistry.gradle-plugin"
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "artifactregistry://asia-maven.pkg.dev/androidsmartedc/smartedc"
+            credentials {
+                username = "_json_key_base64"
+                password = "ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAiYW5kcm9pZHNtYXJ0ZWRjIiwKICAicHJpdmF0ZV9rZXlfaWQiOiAiYjY0NzRkNTRlZDYxOGNhZDQ3NWUzZTUzYmJiNzYyMDVkYjdmNzQ4NyIsCiAgInByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS\n" +
+                        "0tLVxuTUlJRXZnSUJBREFOQmdrcWhraUc5dzBCQVFFRkFBU0NCS2d3Z2dTa0FnRUFBb0lCQVFETy9CaWVxalVYamRFNFxuVHU4dG8wTU5Jb3FaMitGOVlhaEphcUNWMERsMURzdnZSMCtjZE1CeDdHcU80bS9BS2F4bXREVXp6cmhKdGtTYVxudi9vY0dIblNPanBmeTlVK2pVZnVITVNEdmZsdkJBLzQ4bkJ4Qk1NQ3pwRVlBZ2pnV09DdFhISW5tWTlpb3E\n" +
+                        "xYlxuVlNqeGxJZkRMbCtFY1N4WWdRbDhWb3N1dnFMaUxuM3dSRGNoTEtOaFcxeHZ6cG10SmRER3hyZWthS3pMTTFoUVxuMGpvci82blQyRkJ5T3p5RE1WMjVOaEZXR0hoQlZJWUpSclU2Nk8xa25paEoyd3dDVmU3c3UrdmY5TUpQQ2wvQ1xuM2k3VkEvUkh3TVNqMkxiWUJTV3ZmdHpjb3JTYWxkN1VwUTltNEc1MCswRjd5RkVoQUpwQU1McHRONkFrQnNu\n" +
+                        "OVxueG9kZG9sazNBZ01CQUFFQ2dnRUFJeDdEVHFpeXVYeG1zNWN4SGgxRmswVDVINElma0pheFowT2dXOHNvOUtPK1xuRnF1UzVva28zaXV2S085aTVzZ3JhSUhMUlM4ZU5lT25ZRnFTcFpIQm1kb25iWG00aFJTVHorTXh0T2pYR2U4bVxuaHFjY1RSRHh4ZGdtNWx2eUJaOFBBRnRmUXpqYkMzRnUyTUJxWWhOQnRleDRhSkNMWmJqL1V3bWNOQ0pFb1B2V\n" +
+                        "VxuR1FjdzI5M0hNYnhqeWR0T3ZCRlRKRG9XZjZ6SkJJTm44d2xPeXFyWnNQcy93NWhwWXFHREpicmwySFdpR210ZFxuMUdBekY5SWx3VFJKc0dFand3MXZvRUl2cGJyaHlJUHFqT2FIRXFUQWtOY0lHYkRYOExmSVhCTko0MlV2ZmppelxuY3BTR3VzbElGWVZvK2pSN1g5SzN6NU0vUmhQS1hYWGpWc1FWR2JCbEFRS0JnUUQ3SFFZb3FWL0pFcTVWRjJISF\n" +
+                        "xuYS9tNEIrektreFY0VkZjYkpYby9xR3RNY2pySCtYZkUvWmNlQXowU0NISlBTQU9zSHNaYTM2NFdrOVEvVk4zRVxuRnl3bmV6V0dWRWJrRnM5ODRkQ2E2bWFTWDZTcUZUY0NCZ210K29KT1ZxcVJlZ1FxWFRmbGRXN3RIem9PdzNac1xuRU1EK3F4bTRJZDNOOEVzclIra0MwNy9DYVFLQmdRRFRBenhiQTI4NCs3YzNGaVRMMHFyVFhtaVkzRFVyT2N3Y1x\n" +
+                        "uK1phT0lRSm1VVXRmK3ZnMXM4TmUybnZjbWdBcFYwMVlvZnVUb2pNbzRTSVA1T2EzYmtROC82b2cyZVR5Wm9La1xubkNYTUQrbnNwT1ZoLytCSm1JYmNpM2ExeUVyeXk2azltWCs4TVNxM2dtSFV6UUYza05oTG1VRmxLaUVWOHVYMlxuRmRVa0ZWeUtud0tCZ1FDdWVDWDFUbWpNclh3T2h1WmF4anlFam8wSTJsU0tmQjdoTDVMV2M4L0pGM3lid0Vwa1xu\n" +
+                        "eGNTZkI2VUF5SG1UZC9lRk9RU2IwdG1EdWtZM2ttRmFncmNjMzAvNitzY2VabkxXMDVZNmJDM0QrVXZSR0ZoVlxud1pnc0Z1YytRcHpUNHJET05tSkZ2T2ZMUEd6OElQWkFjd3VFWmFEQy9GUzladnp6SDAxWHQ0TitNUUtCZ1FDN1xuZXNDQlRNZmhKU1JmdVRqd0x6aS9tNzNyTXB1NjBCdGVFeE9GTENicHFZa0N1Z1VXRWFXZi9SYlhwYXhIRHQ0Vlxue\n" +
+                        "GJXME1nU3FhWHpPQ2w1QzA2R2xZTEpUaGNVNDZZTmhwYXFmWi9RNjRUYzhudzh6MUdUZVJyc3VQOHIzZGFQa1xucXlFbW43aUlXenQ0eXJ4bTh6WjUxS3lacVpqRDI1QWQyTUFLMHovcG1RS0JnSEcvbGxWOHFmQU9waTRKUHdIcVxuQVYrN1BZN2p0dTlnb2c0bit0RlJDbW00aFd0ZjFvM21ocmE4SEFDUU1kaGFrS082QUtHNXZta3hRQU5IVUs5clxuN1\n" +
+                        "JwTTVNaFRCd09keFBmakJkQXR2Zy9wLzAwUmRmOUhOVTU3bHZ3ak5vV0NHNlRnUUZUSXZLT3drSWV0ZFpCMVxuR0M3bm5SSFVnMENzT2hRT1JJWEFYbUZnXG4tLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tXG4iLAogICJjbGllbnRfZW1haWwiOiAic2VydmljZS1hY2NvdW50LWRldkBhbmRyb2lkc21hcnRlZGMuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20\n" +
+                        "iLAogICJjbGllbnRfaWQiOiAiMTExMjg2MzU4NDk4NjIxNzMyNjQ1IiwKICAiYXV0aF91cmkiOiAiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tL28vb2F1dGgyL2F1dGgiLAogICJ0b2tlbl91cmkiOiAiaHR0cHM6Ly9vYXV0aDIuZ29vZ2xlYXBpcy5jb20vdG9rZW4iLAogICJhdXRoX3Byb3ZpZGVyX3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93\n" +
+                        "d3cuZ29vZ2xlYXBpcy5jb20vb2F1dGgyL3YxL2NlcnRzIiwKICAiY2xpZW50X3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vcm9ib3QvdjEvbWV0YWRhdGEveDUwOS9zZXJ2aWNlLWFjY291bnQtZGV2JTQwYW5kcm9pZHNtYXJ0ZWRjLmlhbS5nc2VydmljZWFjY291bnQuY29tIgp9Cg=="
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+        maven {
+            url "artifactregistry://asia-maven.pkg.dev/androidsmartedc/smartedc-3rd-party"
+            credentials {
+                username = "_json_key_base64"
+                password = "ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAiYW5kcm9pZHNtYXJ0ZWRjIiwKICAicHJpdmF0ZV9rZXlfaWQiOiAiYjY0NzRkNTRlZDYxOGNhZDQ3NWUzZTUzYmJiNzYyMDVkYjdmNzQ4NyIsCiAgInByaXZhdGVfa2V5IjogIi0tLS0tQkVHSU4gUFJJVkFURSBLRVktLS\n" +
+                        "0tLVxuTUlJRXZnSUJBREFOQmdrcWhraUc5dzBCQVFFRkFBU0NCS2d3Z2dTa0FnRUFBb0lCQVFETy9CaWVxalVYamRFNFxuVHU4dG8wTU5Jb3FaMitGOVlhaEphcUNWMERsMURzdnZSMCtjZE1CeDdHcU80bS9BS2F4bXREVXp6cmhKdGtTYVxudi9vY0dIblNPanBmeTlVK2pVZnVITVNEdmZsdkJBLzQ4bkJ4Qk1NQ3pwRVlBZ2pnV09DdFhISW5tWTlpb3E\n" +
+                        "xYlxuVlNqeGxJZkRMbCtFY1N4WWdRbDhWb3N1dnFMaUxuM3dSRGNoTEtOaFcxeHZ6cG10SmRER3hyZWthS3pMTTFoUVxuMGpvci82blQyRkJ5T3p5RE1WMjVOaEZXR0hoQlZJWUpSclU2Nk8xa25paEoyd3dDVmU3c3UrdmY5TUpQQ2wvQ1xuM2k3VkEvUkh3TVNqMkxiWUJTV3ZmdHpjb3JTYWxkN1VwUTltNEc1MCswRjd5RkVoQUpwQU1McHRONkFrQnNu\n" +
+                        "OVxueG9kZG9sazNBZ01CQUFFQ2dnRUFJeDdEVHFpeXVYeG1zNWN4SGgxRmswVDVINElma0pheFowT2dXOHNvOUtPK1xuRnF1UzVva28zaXV2S085aTVzZ3JhSUhMUlM4ZU5lT25ZRnFTcFpIQm1kb25iWG00aFJTVHorTXh0T2pYR2U4bVxuaHFjY1RSRHh4ZGdtNWx2eUJaOFBBRnRmUXpqYkMzRnUyTUJxWWhOQnRleDRhSkNMWmJqL1V3bWNOQ0pFb1B2V\n" +
+                        "VxuR1FjdzI5M0hNYnhqeWR0T3ZCRlRKRG9XZjZ6SkJJTm44d2xPeXFyWnNQcy93NWhwWXFHREpicmwySFdpR210ZFxuMUdBekY5SWx3VFJKc0dFand3MXZvRUl2cGJyaHlJUHFqT2FIRXFUQWtOY0lHYkRYOExmSVhCTko0MlV2ZmppelxuY3BTR3VzbElGWVZvK2pSN1g5SzN6NU0vUmhQS1hYWGpWc1FWR2JCbEFRS0JnUUQ3SFFZb3FWL0pFcTVWRjJISF\n" +
+                        "xuYS9tNEIrektreFY0VkZjYkpYby9xR3RNY2pySCtYZkUvWmNlQXowU0NISlBTQU9zSHNaYTM2NFdrOVEvVk4zRVxuRnl3bmV6V0dWRWJrRnM5ODRkQ2E2bWFTWDZTcUZUY0NCZ210K29KT1ZxcVJlZ1FxWFRmbGRXN3RIem9PdzNac1xuRU1EK3F4bTRJZDNOOEVzclIra0MwNy9DYVFLQmdRRFRBenhiQTI4NCs3YzNGaVRMMHFyVFhtaVkzRFVyT2N3Y1x\n" +
+                        "uK1phT0lRSm1VVXRmK3ZnMXM4TmUybnZjbWdBcFYwMVlvZnVUb2pNbzRTSVA1T2EzYmtROC82b2cyZVR5Wm9La1xubkNYTUQrbnNwT1ZoLytCSm1JYmNpM2ExeUVyeXk2azltWCs4TVNxM2dtSFV6UUYza05oTG1VRmxLaUVWOHVYMlxuRmRVa0ZWeUtud0tCZ1FDdWVDWDFUbWpNclh3T2h1WmF4anlFam8wSTJsU0tmQjdoTDVMV2M4L0pGM3lid0Vwa1xu\n" +
+                        "eGNTZkI2VUF5SG1UZC9lRk9RU2IwdG1EdWtZM2ttRmFncmNjMzAvNitzY2VabkxXMDVZNmJDM0QrVXZSR0ZoVlxud1pnc0Z1YytRcHpUNHJET05tSkZ2T2ZMUEd6OElQWkFjd3VFWmFEQy9GUzladnp6SDAxWHQ0TitNUUtCZ1FDN1xuZXNDQlRNZmhKU1JmdVRqd0x6aS9tNzNyTXB1NjBCdGVFeE9GTENicHFZa0N1Z1VXRWFXZi9SYlhwYXhIRHQ0Vlxue\n" +
+                        "GJXME1nU3FhWHpPQ2w1QzA2R2xZTEpUaGNVNDZZTmhwYXFmWi9RNjRUYzhudzh6MUdUZVJyc3VQOHIzZGFQa1xucXlFbW43aUlXenQ0eXJ4bTh6WjUxS3lacVpqRDI1QWQyTUFLMHovcG1RS0JnSEcvbGxWOHFmQU9waTRKUHdIcVxuQVYrN1BZN2p0dTlnb2c0bit0RlJDbW00aFd0ZjFvM21ocmE4SEFDUU1kaGFrS082QUtHNXZta3hRQU5IVUs5clxuN1\n" +
+                        "JwTTVNaFRCd09keFBmakJkQXR2Zy9wLzAwUmRmOUhOVTU3bHZ3ak5vV0NHNlRnUUZUSXZLT3drSWV0ZFpCMVxuR0M3bm5SSFVnMENzT2hRT1JJWEFYbUZnXG4tLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tXG4iLAogICJjbGllbnRfZW1haWwiOiAic2VydmljZS1hY2NvdW50LWRldkBhbmRyb2lkc21hcnRlZGMuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20\n" +
+                        "iLAogICJjbGllbnRfaWQiOiAiMTExMjg2MzU4NDk4NjIxNzMyNjQ1IiwKICAiYXV0aF91cmkiOiAiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tL28vb2F1dGgyL2F1dGgiLAogICJ0b2tlbl91cmkiOiAiaHR0cHM6Ly9vYXV0aDIuZ29vZ2xlYXBpcy5jb20vdG9rZW4iLAogICJhdXRoX3Byb3ZpZGVyX3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93\n" +
+                        "d3cuZ29vZ2xlYXBpcy5jb20vb2F1dGgyL3YxL2NlcnRzIiwKICAiY2xpZW50X3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vcm9ib3QvdjEvbWV0YWRhdGEveDUwOS9zZXJ2aWNlLWFjY291bnQtZGV2JTQwYW5kcm9pZHNtYXJ0ZWRjLmlhbS5nc2VydmljZWFjY291bnQuY29tIgp9Cg=="
+            }
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
     }
 }
 
