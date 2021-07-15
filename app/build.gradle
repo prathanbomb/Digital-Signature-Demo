@@ -34,10 +34,9 @@ android {
 
 dependencies {
 
-    implementation(project(":digital-signature"))
-
+//    implementation(project(":digital-signature"))
+    implementation 'th.co.digio.smartedc:digital-signature:1.0.0-alpha01'
     implementation 'com.blankj:utilcodex:1.30.6'
-    implementation 'com.itextpdf:sign:7.1.16'
 
     //coroutines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'

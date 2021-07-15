@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import com.blankj.utilcode.util.*
-import com.itextpdf.signatures.*
 import th.co.digio.smartedc.digisign.DigiSignKit
 import th.co.digio.smartedc.digisign.KeyStoreInfo
 import th.co.digio.smartedc.digisign.listener.OnKeyGenListener
